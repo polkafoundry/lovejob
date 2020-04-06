@@ -6,23 +6,63 @@ const DataTypes = Sequelize.DataTypes;
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
   const notification = sequelizeClient.define('notification', {
-    text: {
+    id: {
+      type: DataTypes.BIGINT,
+      primaryKey: true
+    },
+    app: {
       type: DataTypes.STRING,
       allowNull: false
-    }
+    },
+    user: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    content: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    txid: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
   }, {
-    hooks: {
-      beforeCount(options) {
-        options.raw = true;
+    timestamps: true,
+    underscored: true,
+    createdAt: 'created_at',
+    updatedAt: false,
+    tableName: 'notification',
+    indexes : [
+      {
+        unique: false,
+        fields:['app', 'user']
+      },
+      {
+        unique: false,
+        fields:['app', 'user', 'type']
+      },
+      {
+        unique: false,
+        fields:['user', 'type']
+      },
+      {
+        unique: false,
+        fields:['txid']
+      },
+      {
+        unique: false,
+        fields:['created_at']
       }
-    }
+    ]
   });
-
-  // eslint-disable-next-line no-unused-vars
-  notification.associate = function (models) {
-    // Define associations here
-    // See http://docs.sequelizejs.com/en/latest/docs/associations/
-  };
 
   return notification;
 };

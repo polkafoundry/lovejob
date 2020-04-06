@@ -17,28 +17,25 @@ Getting up and running is as easy as 1, 2, 3.
     cd path/to/lovejob
     npm install
     ```
+3. Config your database url in `config/default.json`
 
-3. Start your app
+4. Run migration to create table `notification`
+   ```
+   npm run dev
+   ```   
+
+5. Start your app
 
     ```
     npm start
     ```
+   
+## Debugging
+Change `logging` to true in `src/sequelize.js` to see SQL command output
 
 ## Testing
 
 Simply run `npm test` and all your tests in the `test/` directory will be run.
-
-## Scaffolding
-
-Feathers has a powerful command line interface. Here are a few things it can do:
-
-```
-$ npm install -g @feathersjs/cli          # Install Feathers CLI
-
-$ feathers generate service               # Generate a new Service
-$ feathers generate hook                  # Generate a new Hook
-$ feathers help                           # Show all commands
-```
 
 ## Help
 

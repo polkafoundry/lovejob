@@ -6,27 +6,7 @@
     "default": 10,
     "max": 50
   },
-  "authentication": {
-    "entity": "user",
-    "service": "users",
-    "secret": "0hWuw7f3aqGnD3aSIQ7aZoBn5RQ=",
-    "authStrategies": [
-      "jwt",
-      "local"
-    ],
-    "jwtOptions": {
-      "header": {
-        "typ": "access"
-      },
-      "audience": "https://yourdomain.com",
-      "issuer": "feathers",
-      "algorithm": "HS256",
-      "expiresIn": "1d"
-    },
-    "local": {
-      "usernameField": "email",
-      "passwordField": "password"
-    }
-  },
-  "mysql": "mysql://root:@localhost:3306/lovejob"
+  "mysql": "mysql://root:123456789@localhost:3306/icetea",
+  "expired_duration": 86400,
+  "delete_read_notification" : true
 }
