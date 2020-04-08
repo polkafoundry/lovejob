@@ -1,4 +1,5 @@
 const { IceteaWeb3 } = require("@iceteachain/web3");
+const app = require('../../src/app');
 
 const rpc = process.env.ICETEA_RPC || "https://rpc.icetea.io";
 const tweb3 = new IceteaWeb3(rpc);
@@ -41,6 +42,9 @@ const watchCreateLock = (contract, signal) => {
         return eventName === "createLock";
       });
       console.log("repsNew", repsNew);
+      // add to db: data from repsNew
+      const data = {};
+      app.service('notification').create(data);
     }
   });
 };
