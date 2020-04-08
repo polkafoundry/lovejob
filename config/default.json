@@ -1,12 +1,12 @@
 {
   "host": "localhost",
-  "port": 3030,
+  "port": 3050,
   "public": "../public/",
   "paginate": {
     "default": 10,
     "max": 50
   },
-  "mysql": "mysql://root:123456789@localhost:3306/icetea",
+  "mysql": "mysql://root:123456789@localhost:3306/Notification",
   "expired_duration": 86400,
   "delete_read_notification" : true
 }
