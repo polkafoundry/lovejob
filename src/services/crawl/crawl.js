@@ -1,15 +1,15 @@
+require('dotenv').config()
+
 const { IceteaWeb3 } = require("@iceteachain/web3");
-const rpc = process.env.ICETEA_RPC || "https://rpc.icetea.io";
+const rpc = process.env.ICETEA_RPC || "wss://rpc.icetea.io";
 const tweb3 = new IceteaWeb3(rpc);
+const { mysql } = require('../../../config/default.json')
 
 const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize("Notification", "root", "123456789", {
-  host: "127.0.0.1",
-  dialect: "mysql",
-});
+const sequelize = new Sequelize(mysql);
 
-const CONTRACT = "teat1e75fgzzqfue8kfezlrvmpftpum2wxe0wqjgawn";
+let CONTRACT = "teat1e75fgzzqfue8kfezlrvmpftpum2wxe0wqjgawn";
 
 const contracts = {};
 
@@ -78,9 +78,9 @@ module.exports = {
               repsNew[0].eventData.log.receiver,
               repsNew[0].eventData.log.s_content,
               repsNew[0].eventName,
-              repsNew[0].eventData.log.s_info.date,
+              new Date(Number(repsNew[0].eventData.log.s_info.date)),
             ],
-            type: Sequelize.QueryTypes.UPDATE,
+            type: Sequelize.QueryTypes.INSERT,
           });
         }
       }

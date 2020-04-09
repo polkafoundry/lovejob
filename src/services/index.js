@@ -9,9 +9,6 @@ const {
 module.exports = function (app) {
   app.configure(notification);
   // const signal = {};
-  ensureContract().then((c) => {
-    watchCreateLock(c);
-    // insertDB();
-  });
+  ensureContract().then(watchCreateLock).catch(console.error)
   // insertDB();
 };
