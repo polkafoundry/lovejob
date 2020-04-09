@@ -14,19 +14,19 @@ module.exports = function (app) {
       type: DataTypes.STRING,
       allowNull: false
     },
-    user: {
+    sender: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    type: {
+    receiver: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    content: {
+    promise: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    txid: {
+    event_name: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -43,19 +43,19 @@ module.exports = function (app) {
     indexes : [
       {
         unique: false,
-        fields:['app', 'user']
+        fields:['app', 'sender']
       },
       {
         unique: false,
-        fields:['app', 'user', 'type']
+        fields:['app', 'sender', 'receiver']
       },
       {
         unique: false,
-        fields:['user', 'type']
+        fields:['sender', 'receiver']
       },
       {
         unique: false,
-        fields:['txid']
+        fields:['event_name']
       },
       {
         unique: false,

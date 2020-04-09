@@ -1,6 +1,4 @@
 const { IceteaWeb3 } = require("@iceteachain/web3");
-const app = require('../../src/app');
-
 const rpc = process.env.ICETEA_RPC || "https://rpc.icetea.io";
 const tweb3 = new IceteaWeb3(rpc);
 
@@ -43,13 +41,19 @@ const watchCreateLock = (contract, signal) => {
       });
       console.log("repsNew", repsNew);
       // add to db: data from repsNew
-      const data = {};
-      app.service('notification').create(data);
+      const data = {
+        sender: repsNew[0].eventData.log.sender,
+        receiver : repsNew[0].eventData.log.receiver,
+        promise : repsNew[0].eventData.log.s_content,
+        event_name : repsNew[0].eventName,
+        created_at : repsNew[0].eventData.log.s_info.date,
+      };
+      
     }
   });
 };
 
-module.exports = () => {
+module.exports = (app) => {
   const signal = {};
   let sub;
   ensureContract().then((c) => {
