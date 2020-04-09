@@ -8,7 +8,8 @@ module.exports = function (app) {
   const notification = sequelizeClient.define('notification', {
     id: {
       type: DataTypes.BIGINT,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
     app: {
       type: DataTypes.STRING,

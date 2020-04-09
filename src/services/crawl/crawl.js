@@ -2,7 +2,14 @@ const { IceteaWeb3 } = require("@iceteachain/web3");
 const rpc = process.env.ICETEA_RPC || "https://rpc.icetea.io";
 const tweb3 = new IceteaWeb3(rpc);
 
-const CONTRACT = process.env.LOVELOCK_CONTRACT;
+const Sequelize = require("sequelize");
+
+const sequelize = new Sequelize("Notification", "root", "123456789", {
+  host: "127.0.0.1",
+  dialect: "mysql",
+});
+
+const CONTRACT = "teat1e75fgzzqfue8kfezlrvmpftpum2wxe0wqjgawn";
 
 const contracts = {};
 
@@ -22,6 +29,7 @@ module.exports = {
       .methods.resolve(contract)
       .call()
       .then((c) => {
+        // eslint-disable-next-line no-const-assign
         CONTRACT = c;
         const contractObject = tweb3.contract(c);
         contracts[contract] = contracts[c] = contractObject;
@@ -29,17 +37,27 @@ module.exports = {
       });
   },
 
-  watchCreateLock: (app, contract, signal) => {
+  insertDB: () => {
+    // var insertQuery =
+    //   "INSERT INTO `notification` (`app`,`sender`,`receiver`,`promise`,`event_name`,`created_at`) VALUES (?, ?, ?, ?, ?, ?)";
+    // sequelize.query(insertQuery, {
+    //   replacements: [2, 3, 4, 5, 6, 20200101],
+    //   type: Sequelize.QueryTypes.UPDATE,
+    // });
+  },
+
+  watchCreateLock: (contract) => {
     const filter = {};
+    console.debug("ct", contract);
     return contract.events.allEvents(filter, async (error, result) => {
-      if (signal && signal.cancel) return;
+      // if (signal && signal.cancel) return;
       if (error) {
-        console.log("err", error);
+        console.debug("err", error);
       } else {
         const repsNew = result.filter(({ eventName }) => {
           return eventName === "createLock";
         });
-        console.log("repsNew", repsNew);
+        console.debug("repsNew", repsNew);
         // insert data
         const data = {
           sender: repsNew[0].eventData.log.sender,
@@ -48,7 +66,23 @@ module.exports = {
           event_name: repsNew[0].eventName,
           created_at: repsNew[0].eventData.log.s_info.date,
         };
-        app.service("/notification")._create(data);
+        // app.service("/notification")._create(data);
+        // Create a new notification
+        var insertQuery =
+          "INSERT INTO `notification` (`app`,`sender`,`receiver`,`promise`,`event_name`,`created_at`) VALUES (?, ?, ?, ?, ?, ?)";
+        if (repsNew.length > 0) {
+          sequelize.query(insertQuery, {
+            replacements: [
+              "lovelock",
+              repsNew[0].eventData.log.sender,
+              repsNew[0].eventData.log.receiver,
+              repsNew[0].eventData.log.s_content,
+              repsNew[0].eventName,
+              repsNew[0].eventData.log.s_info.date,
+            ],
+            type: Sequelize.QueryTypes.UPDATE,
+          });
+        }
       }
     });
   },

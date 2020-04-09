@@ -1,13 +1,17 @@
 const notification = require("./notification/notification.service.js");
-const { ensureContract, watchCreateLock } = require("./crawl/crawl.js");
+const {
+  ensureContract,
+  watchCreateLock,
+  insertDB,
+} = require("./crawl/crawl.js");
 
 // eslint-disable-next-line no-unused-vars
 module.exports = function (app) {
   app.configure(notification);
-  const signal = {};
-  let sub;
+  // const signal = {};
   ensureContract().then((c) => {
-    sub = watchCreateLock(app, c, signal);
+    watchCreateLock(c);
+    // insertDB();
   });
-  console.log("sub", sub);
+  // insertDB();
 };
