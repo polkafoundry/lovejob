@@ -48,7 +48,6 @@ module.exports = {
 
   watchCreateLock: (contract) => {
     const filter = {};
-    console.debug("ct", contract);
     return contract.events.allEvents(filter, async (error, result) => {
       // if (signal && signal.cancel) return;
       if (error) {
