@@ -32,7 +32,7 @@ module.exports = function (app) {
       allowNull: false
     },
     created_at: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       allowNull: false
     },
   }, {

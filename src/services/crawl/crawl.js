@@ -1,5 +1,5 @@
 const { IceteaWeb3 } = require("@iceteachain/web3");
-const rpc = process.env.ICETEA_RPC || "https://rpc.icetea.io";
+const rpc = "ws://localhost:26657/websocket" || "https://rpc.icetea.io";
 const tweb3 = new IceteaWeb3(rpc);
 
 const Sequelize = require("sequelize");
@@ -25,13 +25,15 @@ const getAliasContract = () => getContract("system.alias");
 module.exports = {
   ensureContract: () => {
     const contract = CONTRACT;
+    console.debug("ensureContract", contract);
     return getAliasContract()
       .methods.resolve(contract)
       .call()
       .then((c) => {
         // eslint-disable-next-line no-const-assign
-        CONTRACT = c;
+        c = CONTRACT;
         const contractObject = tweb3.contract(c);
+        console.debug("contractObject", contractObject);
         contracts[contract] = contracts[c] = contractObject;
         return contractObject;
       });
@@ -48,7 +50,7 @@ module.exports = {
 
   watchCreateLock: (contract) => {
     const filter = {};
-    console.debug("ct", contract);
+    console.debug("watchCreateLockCt", contract);
     return contract.events.allEvents(filter, async (error, result) => {
       // if (signal && signal.cancel) return;
       if (error) {
