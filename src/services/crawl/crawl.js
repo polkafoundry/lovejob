@@ -15,50 +15,41 @@ const getContract = (address = CONTRACT) => {
 
 const getAliasContract = () => getContract("system.alias");
 
-const ensureContract = () => {
-  const contract = CONTRACT;
-  if (contract.indexOf(".") < 0) return Promise.resolve(getContract(contract));
-  return getAliasContract()
-    .methods.resolve(contract)
-    .call()
-    .then((c) => {
-      CONTRACT = c;
-      const contractObject = tweb3.contract(c);
-      contracts[contract] = contracts[c] = contractObject;
-      return contractObject;
-    });
-};
-
-const watchCreateLock = (contract, signal) => {
-  const filter = {};
-  return contract.events.allEvents(filter, async (error, result) => {
-    if (signal && signal.cancel) return;
-    if (error) {
-      console.log("err", error);
-    } else {
-      const repsNew = result.filter(({ eventName }) => {
-        return eventName === "createLock";
+module.exports = {
+  ensureContract: () => {
+    const contract = CONTRACT;
+    return getAliasContract()
+      .methods.resolve(contract)
+      .call()
+      .then((c) => {
+        CONTRACT = c;
+        const contractObject = tweb3.contract(c);
+        contracts[contract] = contracts[c] = contractObject;
+        return contractObject;
       });
-      console.log("repsNew", repsNew);
-      // add to db: data from repsNew
-      const data = {
-        sender: repsNew[0].eventData.log.sender,
-        receiver : repsNew[0].eventData.log.receiver,
-        promise : repsNew[0].eventData.log.s_content,
-        event_name : repsNew[0].eventName,
-        created_at : repsNew[0].eventData.log.s_info.date,
-      };
-      
-    }
-  });
-};
+  },
 
-module.exports = (app) => {
-  const signal = {};
-  let sub;
-  ensureContract().then((c) => {
-    sub = watchCreateLock(c, signal);
-  });
-
-  return sub;
+  watchCreateLock: (app, contract, signal) => {
+    const filter = {};
+    return contract.events.allEvents(filter, async (error, result) => {
+      if (signal && signal.cancel) return;
+      if (error) {
+        console.log("err", error);
+      } else {
+        const repsNew = result.filter(({ eventName }) => {
+          return eventName === "createLock";
+        });
+        console.log("repsNew", repsNew);
+        // insert data
+        const data = {
+          sender: repsNew[0].eventData.log.sender,
+          receiver: repsNew[0].eventData.log.receiver,
+          promise: repsNew[0].eventData.log.s_content,
+          event_name: repsNew[0].eventName,
+          created_at: repsNew[0].eventData.log.s_info.date,
+        };
+        app.service("/notification")._create(data);
+      }
+    });
+  },
 };
