@@ -5,7 +5,7 @@ const { query, disconnect } = require('./db')
 
 fastify.get('/noti/list', async (request, reply) => {
   const address = request.query.address
-  debug(address)
+  debug(`Get notifications for ${address}`)
   if (!address) {
     return {
       ok: false,
@@ -13,14 +13,42 @@ fastify.get('/noti/list', async (request, reply) => {
     }
   }
 
-  const sql = 'SELECT * FROM notification WHERE sender = ? OR receiver = ?'
+  const sql = 'SELECT * FROM notification WHERE sender <> receiver AND receiver = ? ORDER BY id DESC LIMIT 10'
   try {
-    const result = await query(sql, [address, address])
+    const result = await query(sql, [address])
     return {
       ok: true,
       result
     }
   } catch (error) {
+    debug(error)
+    return {
+      ok: false,
+      error: String(error)
+    }
+  }
+})
+
+// mark an notification as read
+fastify.get('/noti/mark', async (request, reply) => {
+  const id = request.query.id
+  debug(`Mark ${id} as read`)
+  if (!id) {
+    return {
+      ok: false,
+      error: 'Id is required.'
+    }
+  }
+
+  const sql = 'DELETE FROM notification WHERE id = ?'
+  try {
+    const result = await query(sql, [id])
+    return {
+      ok: true,
+      result
+    }
+  } catch (error) {
+    debug(error)
     return {
       ok: false,
       error: String(error)
