@@ -13,13 +13,25 @@ exports.convertValue = (value, converters) => {
         return Number(value)
       case 'String':
         return String(value)
+      case 'Date':
+        return new Date(value)
       case 'JSON.stringify':
         return JSON.stringify(value)
       case 'toString.base64':
         return value.toString('base64')
-      case 'fromTimestamp': {
-        const unix = Math.floor(Number(value) / 1000)
-        return `FROM_UNIXTIME(${unix})`
+        case 'toString.hex':
+          return value.toString('hex')
+      case 'toMySqlTime': {
+        if (value == null) return value
+        if (typeof value.getUTCFullYear !== 'function') {
+          value = new Date(value)
+        }
+        return value.getUTCFullYear() + '-' +
+          ('00' + (value.getUTCMonth() + 1)).slice(-2) + '-' +
+          ('00' + value.getUTCDate()).slice(-2) + ' ' +
+          ('00' + value.getUTCHours()).slice(-2) + ':' +
+          ('00' + value.getUTCMinutes()).slice(-2) + ':' +
+          ('00' + value.getUTCSeconds()).slice(-2)
       }
       default:
         return value
