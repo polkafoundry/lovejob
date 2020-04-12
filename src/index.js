@@ -1,13 +1,13 @@
 require("dotenv").config();
 const debug = require("debug")("lovejob:web");
 const fastify = require("fastify")({ logger: process.env.WEB_LOG === "1" });
+const cors = require('fastify-cors');
 const { query, disconnect } = require("./db");
 const { handleOptions } = require("./util");
 
+fastify.register(cors, handleOptions())
+
 fastify.get("/noti/list", async (request, reply) => {
-  if (request.method === "options") {
-    handleOptions(reply);
-  }
   const address = request.query.address;
   debug(`Get notifications for ${address}`);
   if (!address) {
