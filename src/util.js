@@ -28,3 +28,15 @@ exports.convertValue = (value, converters) => {
 
   return converters.reduce(convert, value)
 }
+
+exports.handleOptions = res => {
+  res.setHeader("access-control-allow-origin", "*");
+  res.setHeader("access-control-allow-credentials", "true");
+  res.setHeader("access-control-allow-methods", "GET, POST, PUT, OPTIONS");
+  res.setHeader("access-control-allow-headers", "Authorization");
+  res.setHeader("access-control-max-age", 86400);
+  res.setHeader("Content-Type", "text/plain charset=UTF-8");
+  res.setHeader("Content-Type", 0);
+  res.writeHead(204); // no content
+  res.end();
+}

@@ -1,4 +1,4 @@
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456789';
 flush privileges;
 
 DROP TABLE IF EXISTS `notification`;
@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS `notification`;
 CREATE TABLE `notification` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `event_name` varchar(255) NOT NULL,
+  `display_name` varchar(255) NOT NULL,
+  `avatar` varchar(255) NOT NULL,
   `sender` varchar(255) NOT NULL,
   `receiver` varchar(255) NOT NULL,
   `content` varchar(255) NOT NULL,
