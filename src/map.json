@@ -1,0 +1,11 @@
+{
+    "table": "notification",
+    "mapping": {
+        "createLock": {
+            "sender": "eventData.by",
+            "receiver": "eventData.log.receiver",
+            "content": "eventData.log.s_content",
+            "created_at": "eventData.log.s_info.date"
+        }
+    }
+}
