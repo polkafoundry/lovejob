@@ -64,7 +64,7 @@ fastify.get("/noti/mark", async (request, reply) => {
 // Run the server!
 const start = async () => {
   try {
-    await fastify.listen(9000);
+    await fastify.listen(process.env.PORT);
     debug(`server listening on ${fastify.server.address().port}`);
   } catch (err) {
     fastify.log.error(err);
