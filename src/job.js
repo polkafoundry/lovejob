@@ -43,6 +43,7 @@ const watchEvents = async () => {
       // covert to array of items
       const eventName = item.eventName;
       const sender = item.eventData.by;
+      //get displayName, avatar
       const tags = await web3
         .contract("system.did")
         .methods.query(sender)
@@ -54,6 +55,8 @@ const watchEvents = async () => {
       debug(tags);
       const displayName = tags["display-name"] || "";
       const avatar = tags.avatar || "";
+
+      //get item from map
       const map = mapping[eventName];
       if (map) {
         const columns = [

@@ -3,9 +3,19 @@
     "mapping": {
         "createLock": {
             "sender": "eventData.by",
+            "status": "eventData.log.status",
+            "coverImg": "eventData.log.coverImg",
             "receiver": "eventData.log.receiver",
             "content": "eventData.log.s_content",
+            "lockIndex": "eventData.log.id",
             "created_at": "eventData.log.s_info.date"
+        },
+        "addMemory": {
+            "sender": "eventData.by",
+            "receiver": "eventData.log.receiver",
+            "content": "eventData.log.content",
+            "lockIndex": "eventData.log.lockIndex",
+            "created_at": "eventData.log.info.date"
         }
     }
 }
