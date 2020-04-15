@@ -1,11 +1,11 @@
 require("dotenv").config();
 const debug = require("debug")("lovejob:web");
 const fastify = require("fastify")({ logger: process.env.WEB_LOG === "1" });
-const cors = require('fastify-cors');
+const cors = require("fastify-cors");
 const { query, disconnect } = require("./db");
 const { handleOptions } = require("./util");
 
-fastify.register(cors, handleOptions())
+fastify.register(cors, handleOptions());
 
 fastify.get("/noti/list", async (request, reply) => {
   const address = request.query.address;
@@ -21,6 +21,34 @@ fastify.get("/noti/list", async (request, reply) => {
     "SELECT * FROM notification WHERE sender <> receiver AND receiver = ? ORDER BY id DESC LIMIT 10";
   try {
     const result = await query(sql, [address]);
+    return {
+      ok: true,
+      result,
+    };
+  } catch (error) {
+    debug(error);
+    return {
+      ok: false,
+      error: String(error),
+    };
+  }
+});
+
+//noti like, comment
+fastify.get("/noti/list/lc", async (request, reply) => {
+  const address = request.query.address;
+  debug(`Get notifications for ${address}`);
+  if (!address) {
+    return {
+      ok: false,
+      error: "Address is required.",
+    };
+  }
+
+  const sql =
+    "SELECT * FROM notification WHERE event_name IN ('addLike', 'addComment') AND (receiver = ? OR sender = ?) ORDER BY id DESC LIMIT 10";
+  try {
+    const result = await query(sql, [address, address]);
     return {
       ok: true,
       result,
