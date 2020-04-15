@@ -19,8 +19,8 @@ exports.convertValue = (value, converters) => {
         return JSON.stringify(value)
       case 'toString.base64':
         return value.toString('base64')
-        case 'toString.hex':
-          return value.toString('hex')
+      case 'toString.hex':
+        return value.toString('hex')
       case 'toMySqlTime': {
         if (value == null) return value
         if (typeof value.getUTCFullYear !== 'function') {
@@ -47,6 +47,6 @@ exports.handleOptions = () => {
     methods: 'GET,POST,PUT,OPTIONS',
     credentials: true,
     maxAge: 86400,
-    allowedHeaders: 'Authorization',
+    allowedHeaders: 'Authorization'
   }
 }
