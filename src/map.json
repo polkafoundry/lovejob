@@ -16,6 +16,21 @@
             "content": "eventData.log.content",
             "lockIndex": "eventData.log.lockIndex",
             "created_at": "eventData.log.info.date"
+        },
+        "addLike": {
+            "coverImg": "eventData.by",
+            "sender": "eventData.sender",
+            "receiver": "eventData.receiver",
+            "lockIndex": "eventData.memoIndex",
+            "created_at": "eventData.timestamp"
+        },
+        "addComment": {
+            "coverImg": "eventData.by",
+            "sender": "eventData.log.sender",
+            "receiver": "eventData.log.receiver",
+            "lockIndex": "eventData.log.id",
+            "content": "eventData.log.content",
+            "created_at": "eventData.log.timestamp"
         }
     }
 }
