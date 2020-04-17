@@ -91,6 +91,33 @@ fastify.get('/noti/mark', async (request, reply) => {
   }
 })
 
+// mark lock as read
+fastify.get('/noti/lock/mark', async (request, reply) => {
+  const id = request.query.id
+  debug(`Mark ${id} as read`)
+  if (!id) {
+    return {
+      ok: false,
+      error: 'Id is required.'
+    }
+  }
+
+  const sql = 'DELETE FROM notification WHERE lockIndex = ?'
+  try {
+    const result = await query(sql, [id])
+    return {
+      ok: true,
+      result
+    }
+  } catch (error) {
+    debug(error)
+    return {
+      ok: false,
+      error: String(error)
+    }
+  }
+})
+
 // Run the server!
 const start = async () => {
   try {
