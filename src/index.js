@@ -102,7 +102,7 @@ fastify.get('/noti/lock/mark', async (request, reply) => {
     }
   }
 
-  const sql = 'DELETE FROM notification WHERE lockIndex = ?'
+  const sql = "DELETE FROM notification WHERE event_name IN ('createLock') AND lockIndex = ?"
   try {
     const result = await query(sql, [id])
     return {
