@@ -2,7 +2,7 @@
     "table": "notification",
     "mapping": {
         "createLock": {
-            "values": {
+            "map": {
                 "sender": "eventData.by",
                 "status": "eventData.log.status",
                 "coverImg": "eventData.log.coverImg",
@@ -13,7 +13,7 @@
             }
         },
         "addMemory": {
-            "values": {
+            "map": {
                 "sender": "eventData.by",
                 "receiver": "eventData.log.receiver",
                 "content": "eventData.log.content",
@@ -22,7 +22,7 @@
             }
         },
         "addLike": {
-            "values": {
+            "map": {
                 "coverImg": "eventData.by",
                 "sender": "eventData.sender",
                 "receiver": "eventData.receiver",
@@ -34,7 +34,7 @@
             "options": {
                 "detectTags": "eventData.log.content"
             },
-            "values": {
+            "map": {
                 "coverImg": "eventData.by",
                 "sender": "eventData.log.memSender",
                 "receiver": "eventData.log.receiver",

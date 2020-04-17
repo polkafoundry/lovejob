@@ -2,7 +2,7 @@ require('dotenv').config()
 
 const debug = require('debug')('lovejob:job')
 const _ = require('lodash')
-const { ensureContract, convertValue } = require('./util')
+const { ensureContract, convertValue, detectTags } = require('./util')
 const { table, mapping } = require('./map.json')
 
 const { IceteaWeb3 } = require('@iceteachain/web3')
@@ -57,7 +57,7 @@ const watchEvents = async () => {
       const avatar = tags.avatar || ''
 
       // get item from map
-      const { values: map, options = {}} = mapping[eventName] || {}
+      const { map, options = {}} = mapping[eventName] || {}
       if (map) {
         const columns = [
           '`event_name`',
@@ -82,6 +82,12 @@ const watchEvents = async () => {
         )}) VALUES (${params})`
         debug(sql, values)
         query(sql, values).catch(debug)
+
+        // now, detec tags
+        if (options.detectTags) {
+          const tags = detectTags(_.get(item, options.detectTags))
+          debug(tags)
+        }
       }
     })
   })

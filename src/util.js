@@ -50,3 +50,15 @@ exports.handleOptions = () => {
     allowedHeaders: 'Authorization'
   }
 }
+
+exports.detectTags = text => {
+  const ms = text.match(/@\[(.+?)\-(.+?)\]/s)
+  const tags = []
+  for (const m of ms) {
+    tags.push({
+      username: m[1],
+      display_name: m[2]
+    })
+  }
+  return tags
+}
