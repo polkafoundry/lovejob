@@ -2,35 +2,46 @@
     "table": "notification",
     "mapping": {
         "createLock": {
-            "sender": "eventData.by",
-            "status": "eventData.log.status",
-            "coverImg": "eventData.log.coverImg",
-            "receiver": "eventData.log.receiver",
-            "content": "eventData.log.s_content",
-            "lockIndex": "eventData.log.id",
-            "created_at": "eventData.log.s_info.date"
+            "values": {
+                "sender": "eventData.by",
+                "status": "eventData.log.status",
+                "coverImg": "eventData.log.coverImg",
+                "receiver": "eventData.log.receiver",
+                "content": "eventData.log.s_content",
+                "lockIndex": "eventData.log.id",
+                "created_at": "eventData.log.s_info.date"
+            }
         },
         "addMemory": {
-            "sender": "eventData.by",
-            "receiver": "eventData.log.receiver",
-            "content": "eventData.log.content",
-            "lockIndex": "eventData.log.lockIndex",
-            "created_at": "eventData.log.info.date"
+            "values": {
+                "sender": "eventData.by",
+                "receiver": "eventData.log.receiver",
+                "content": "eventData.log.content",
+                "lockIndex": "eventData.log.lockIndex",
+                "created_at": "eventData.log.info.date"
+            }
         },
         "addLike": {
-            "coverImg": "eventData.by",
-            "sender": "eventData.sender",
-            "receiver": "eventData.receiver",
-            "lockIndex": "eventData.memoIndex",
-            "created_at": "eventData.timestamp"
+            "values": {
+                "coverImg": "eventData.by",
+                "sender": "eventData.sender",
+                "receiver": "eventData.receiver",
+                "lockIndex": "eventData.memoIndex",
+                "created_at": "eventData.timestamp"
+            }
         },
         "addComment": {
-            "coverImg": "eventData.by",
-            "sender": "eventData.log.memSender",
-            "receiver": "eventData.log.receiver",
-            "lockIndex": "eventData.log.id",
-            "content": "eventData.log.content",
-            "created_at": "eventData.log.timestamp"
+            "options": {
+                "detectTags": "eventData.log.content"
+            },
+            "values": {
+                "coverImg": "eventData.by",
+                "sender": "eventData.log.memSender",
+                "receiver": "eventData.log.receiver",
+                "lockIndex": "eventData.log.id",
+                "content": "eventData.log.content",
+                "created_at": "eventData.log.timestamp"
+            }
         }
     }
 }

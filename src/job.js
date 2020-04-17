@@ -57,7 +57,7 @@ const watchEvents = async () => {
       const avatar = tags.avatar || ''
 
       // get item from map
-      const map = mapping[eventName]
+      const { values: map, options = {}} = mapping[eventName] || {}
       if (map) {
         const columns = [
           '`event_name`',
