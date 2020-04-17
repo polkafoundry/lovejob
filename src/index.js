@@ -36,33 +36,33 @@ fastify.get('/noti/list', async (request, reply) => {
   }
 })
 
-//noti like, comment
-fastify.get("/noti/list/lc", async (request, reply) => {
-  const address = request.query.address;
-  debug(`Get notifications for ${address}`);
+// noti like, comment
+fastify.get('/noti/list/lc', async (request, reply) => {
+  const address = request.query.address
+  debug(`Get notifications for ${address}`)
   if (!address) {
     return {
       ok: false,
-      error: "Address is required.",
-    };
+      error: 'Address is required.'
+    }
   }
 
   const sql =
-    "SELECT * FROM notification WHERE event_name IN ('addLike', 'addComment') AND (receiver = ? OR sender = ?) ORDER BY id DESC LIMIT 10";
+    "SELECT * FROM notification WHERE event_name IN ('addLike', 'addComment') AND (receiver = ? OR sender = ?) ORDER BY id DESC LIMIT 10"
   try {
-    const result = await query(sql, [address, address]);
+    const result = await query(sql, [address, address])
     return {
       ok: true,
-      result,
-    };
+      result
+    }
   } catch (error) {
-    debug(error);
+    debug(error)
     return {
       ok: false,
-      error: String(error),
-    };
+      error: String(error)
+    }
   }
-});
+})
 
 // mark an notification as read
 fastify.get('/noti/mark', async (request, reply) => {
@@ -102,7 +102,7 @@ fastify.get('/noti/lock/mark', async (request, reply) => {
     }
   }
 
-  const sql = 'DELETE FROM notification WHERE lockIndex = ?'
+  const sql = "DELETE FROM notification WHERE event_name IN ('createLock') AND lockIndex = ?"
   try {
     const result = await query(sql, [id])
     return {
