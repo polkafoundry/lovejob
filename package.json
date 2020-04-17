@@ -9,7 +9,8 @@
     "test": "standard --fix",
     "start": "standard --fix && node src/index.js",
     "dev": "nodemon src/index.js",
-    "job": "node src/job.js"
+    "job": "node src/job.js",
+    "jobmon": "nodemon src/job.js"
   },
   "standard": {
     "ignore": []

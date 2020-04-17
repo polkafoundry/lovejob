@@ -1,103 +1,81 @@
 require('dotenv').config()
-
 const debug = require('debug')('lovejob:job')
-const _ = require('lodash')
-const { ensureContract, convertValue, detectTags } = require('./util')
+
+const {
+  getValue,
+  getTargets,
+  handleTargets,
+  getActor,
+  handleTags,
+  push,
+  handleError
+} = require('./util')
+
+const {
+  initWeb3,
+  listenAllEvents
+} = require('./web3')
+
 const { table, mapping } = require('./map.json')
 
-const { IceteaWeb3 } = require('@iceteachain/web3')
-const web3 = new IceteaWeb3(process.env.ICETEA_RPC)
+const handleEvent = async result => {
+  debug(result)
+  result.forEach(async item => {
+    const eventName = item.eventName
 
-const { query, disconnect } = require('./db')
+    const eventConfigs = mapping.filter(m => m.eventName === eventName)
+    if (!eventConfigs.length) return
 
-const close = () => {
-  const unsub =
-    global._sub && global._sub.unsubscribe
-      ? global._sub.unsubscribe()
-      : Promise.resolve(undefined)
-  unsub.finally(() => {
-    Promise.resolve(web3.close()).finally(disconnect(debug))
-  })
-}
+    eventConfigs.forEach(async ({ map, options = {} }) => {
+      const {
+        conditions,
+        actorPath = 'eventData.by',
+        targetPaths = ['eventData.log.sender', 'eventData.log.receiver'],
+        tagPath
+      } = options
 
-const handleError = (error) => {
-  debug(error)
-  close()
-
-  // for some reason, it does not exit
-  setTimeout(() => {
-    process.exit(1)
-  }, 5000)
-}
-
-const watchEvents = async () => {
-  const contract = await ensureContract(web3, process.env.LOVELOCK_CONTRACT)
-  global._sub = contract.events.allEvents({}, async (error, result) => {
-    if (error) {
-      handleError(error)
-      return
-    }
-
-    debug(result)
-    result.forEach(async (item) => {
-      // covert to array of items
-      const eventName = item.eventName
-      const sender = item.eventData.by
-      // get displayName, avatar
-      const tags = await web3
-        .contract('system.did')
-        .methods.query(sender)
-        .call()
-        .then(({ tags = {} } = {}) => {
-          item.tags = tags
-          return tags
+      // Check conditions whether to skip this item
+      if (conditions) {
+        const ok = Object.entries(conditions).every(([path, mustBe]) => {
+          const value = getValue(item, path)
+          return value === mustBe
         })
-      debug(tags)
-      const displayName = tags['display-name'] || ''
-      const avatar = tags.avatar || ''
-
-      // get item from map
-      const { map, options = {}} = mapping[eventName] || {}
-      if (map) {
-        const columns = [
-          '`event_name`',
-          ...Object.keys(map).map((x) => '`' + x + '`'),
-          '`display_name`',
-          '`avatar`'
-        ]
-        const params = '?' + ',?'.repeat(columns.length - 1)
-        const values = Object.values(map).reduce(
-          (list, value) => {
-            const [prop, ...converters] = value.split('/')
-            const v = convertValue(_.get(item, prop), converters)
-            list.push(v)
-            return list
-          },
-          [eventName]
-        )
-        values.push(displayName)
-        values.push(avatar)
-        const sql = `INSERT IGNORE INTO \`${table}\` (${columns.join(
-          ','
-        )}) VALUES (${params})`
-        debug(sql, values)
-        query(sql, values).catch(debug)
-
-        // now, detec tags
-        if (options.detectTags) {
-          const tags = detectTags(_.get(item, options.detectTags))
-          debug(tags)
+        if (!ok) {
+          debug('Item skipped')
+          return
         }
       }
+
+      // get actor address, displayName, avatar
+      const { actorAddr, actorName, actorAvatar } = await getActor(item, actorPath)
+
+      const columns = [
+        '`event_name`',
+        '`actor_addr`',
+        '`actor_name`',
+        '`actor_avatar`',
+        ...Object.keys(map).map((x) => '`' + x + '`'),
+        '`target`'
+      ]
+      const params = '?' + ',?'.repeat(columns.length - 1)
+      const values = Object.values(map).reduce(
+        (list, path) => push(list, getValue(item, path)),
+        [eventName, actorAddr, actorName, actorAvatar]
+      )
+
+      const sql = `INSERT IGNORE INTO \`${table}\` (${columns}) VALUES (${params})`
+      const targets = getTargets(item, targetPaths, actorAddr)
+      handleTargets(sql, values, targets)
+
+      // now, handle tagging usernames
+      handleTags(item, tagPath, sql, values, targetPaths)
     })
   })
 }
 
 const start = () => {
-  // exit in case the websocket is lost (e.g. rpc restarts), so pm2 can restart things
-  web3.onError(handleError)
-
-  watchEvents()
+  initWeb3(handleError)
+  listenAllEvents(handleEvent, handleError)
 
   debug('Job is watching for events...')
 }

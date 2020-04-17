@@ -1,47 +1,89 @@
 {
     "table": "notification",
-    "mapping": {
-        "createLock": {
-            "map": {
-                "sender": "eventData.by",
-                "status": "eventData.log.status",
-                "coverImg": "eventData.log.coverImg",
-                "receiver": "eventData.log.receiver",
-                "content": "eventData.log.s_content",
-                "lockIndex": "eventData.log.id",
-                "created_at": "eventData.log.s_info.date"
-            }
-        },
-        "addMemory": {
-            "map": {
-                "sender": "eventData.by",
-                "receiver": "eventData.log.receiver",
-                "content": "eventData.log.content",
-                "lockIndex": "eventData.log.lockIndex",
-                "created_at": "eventData.log.info.date"
-            }
-        },
-        "addLike": {
-            "map": {
-                "coverImg": "eventData.by",
-                "sender": "eventData.sender",
-                "receiver": "eventData.receiver",
-                "lockIndex": "eventData.memoIndex",
-                "created_at": "eventData.timestamp"
-            }
-        },
-        "addComment": {
+    "mapping": [
+        {
+            "eventName": "createLock",
             "options": {
-                "detectTags": "eventData.log.content"
+                "conditions": {
+                    "eventData.log.type": 0
+                }
             },
             "map": {
-                "coverImg": "eventData.by",
-                "sender": "eventData.log.memSender",
-                "receiver": "eventData.log.receiver",
-                "lockIndex": "eventData.log.id",
-                "content": "eventData.log.content",
-                "created_at": "eventData.log.timestamp"
+                "text": "eventData.log.s_content",
+                "image": "eventData.log.coverImg",
+                "timestamp": "eventData.log.s_info.date",
+                "item_id": "eventData.log.id",
+                "item_type": "eventData.log.type",
+                "item_status": "eventData.log.status",
+                "item_sender": "eventData.log.sender",
+                "item_receiver": "eventData.log.receiver"
+            }
+        },
+        {
+            "eventName": "addMemory",
+            "options": {
+                "conditions": {
+                    "eventData.log.info.blog/Boolean": false
+                },
+                "tagPath": "eventData.log.content"
+            },
+            "map": {
+                "text": "eventData.log.content",
+                "image": "eventData.log.info.hash.0",
+                "item_id": "eventData.log.id",
+                "item_type": "eventData.log.type",
+                "item_data": "eventData.log.lockIndex",
+                "timestamp": "eventData.log.info.date",
+                "item_sender": "eventData.log.sender",
+                "item_receiver": "eventData.log.receiver"
+            }
+        },
+        {
+            "eventName": "addMemory",
+            "options": {
+                "conditions": {
+                    "eventData.log.info.blog": true
+                }
+            },
+            "map": {
+                "text": "eventData.log.content/JSON.parse/_get.meta.title",
+                "image": "eventData.log.content/JSON.parse/_get.meta.coverPhoto.url",
+                "item_id": "eventData.log.id",
+                "item_type": "eventData.log.type",
+                "item_flag": true,
+                "timestamp": "eventData.log.info.date",
+                "item_sender": "eventData.log.sender",
+                "item_receiver": "eventData.log.receiver"
+            }
+        },
+        {
+            "eventName": "addLike",
+            "options": {
+                "conditions": {
+                    "eventData.log.isLike": true
+                }
+            },
+            "map": {
+                "item_id": "eventData.log.id",
+                "item_type": "eventData.log.type",
+                "item_flag": true,
+                "timestamp": "eventData.log.timestamp",
+                "item_sender": "eventData.log.sender",
+                "item_receiver": "eventData.log.receiver"
+            }
+        },
+        {
+            "eventName": "addComment",
+            "options": {
+                "tagPath": "eventData.log.content"
+            },
+            "map": {
+                "item_id": "eventData.log.id",
+                "text": "eventData.log.content",
+                "timestamp": "eventData.log.timestamp",
+                "item_sender": "eventData.log.sender",
+                "item_receiver": "eventData.log.receiver"
             }
         }
-    }
+    ]
 }

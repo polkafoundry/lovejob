@@ -9,7 +9,7 @@ fastify.register(cors, handleOptions())
 fastify.get('/', async (request, reply) => {
   reply.send('Wellcome LoveJob API!')
 })
-fastify.get('/noti/list', async (request, reply) => {
+fastify.get('/noti/list', async (request) => {
   const address = request.query.address
   debug(`Get notifications for ${address}`)
   if (!address) {
@@ -19,38 +19,14 @@ fastify.get('/noti/list', async (request, reply) => {
     }
   }
 
-  const sql =
-    'SELECT * FROM notification WHERE sender <> receiver AND receiver = ? ORDER BY id DESC LIMIT 10'
-  try {
-    const result = await query(sql, [address])
-    return {
-      ok: true,
-      result
-    }
-  } catch (error) {
-    debug(error)
-    return {
-      ok: false,
-      error: String(error)
-    }
-  }
-})
+  const sqlLock =
+    "SELECT * FROM notification WHERE event_name = 'createLock' AND target = ? ORDER BY id DESC LIMIT 10"
 
-// noti like, comment
-fastify.get('/noti/list/lc', async (request, reply) => {
-  const address = request.query.address
-  debug(`Get notifications for ${address}`)
-  if (!address) {
-    return {
-      ok: false,
-      error: 'Address is required.'
-    }
-  }
+  const sqlNonLock =
+    "SELECT * FROM notification WHERE event_name <> 'createLock' AND target = ? ORDER BY id DESC LIMIT 10"
 
-  const sql =
-    "SELECT * FROM notification WHERE event_name IN ('addLike', 'addComment') AND (receiver = ? OR sender = ?) AND coverImg <> ? ORDER BY id DESC LIMIT 10"
   try {
-    const result = await query(sql, [address, address, address])
+    const result = await Promise.all([query(sqlLock, [address]), query(sqlNonLock, [address])]) 
     return {
       ok: true,
       result
@@ -65,46 +41,21 @@ fastify.get('/noti/list/lc', async (request, reply) => {
 })
 
 // mark an notification as read
-fastify.get('/noti/mark', async (request, reply) => {
-  const id = request.query.id
-  debug(`Mark ${id} as read`)
-  if (!id) {
+fastify.get('/noti/mark', async (request) => {
+  const { id, lock_id: lockId } = request.query
+  const [field, value] = id == null ? ['item_id', lockId] : ['id', id]
+  debug(`Mark ${field} = ${value} as read`)
+  if (value == null) {
     return {
       ok: false,
-      error: 'Id is required.'
+      error: 'Either id or lock_id is required.'
     }
   }
 
-  const sql = 'DELETE FROM notification WHERE id = ?'
+  const where = field === 'item_id' ? "event_name = 'createLock' AND " : ''
+  const sql = `DELETE FROM notification WHERE ${where}${field} = ?`
   try {
-    const result = await query(sql, [id])
-    return {
-      ok: true,
-      result
-    }
-  } catch (error) {
-    debug(error)
-    return {
-      ok: false,
-      error: String(error)
-    }
-  }
-})
-
-// mark lock as read
-fastify.get('/noti/lock/mark', async (request, reply) => {
-  const id = request.query.id
-  debug(`Mark ${id} as read`)
-  if (!id) {
-    return {
-      ok: false,
-      error: 'Id is required.'
-    }
-  }
-
-  const sql = "DELETE FROM notification WHERE event_name IN ('createLock') AND lockIndex = ?"
-  try {
-    const result = await query(sql, [id])
+    const result = await query(sql, [value])
     return {
       ok: true,
       result

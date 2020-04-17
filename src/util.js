@@ -1,9 +1,9 @@
-exports.ensureContract = (web3, contract) => web3.contract('system.alias')
-  .methods.resolve(contract)
-  .call()
-  .then(c => web3.contract(c))
+const _ = require('lodash')
+const { query, disconnect } = require('./db')
+const debug = require('debug')('lovejob:util')
+const { queryTags, resolveAlias, closeWeb3 } = require('./web3')
 
-exports.convertValue = (value, converters) => {
+const convertValue = (value, converters) => {
   if (!converters || !converters.length) return value
 
   const convert = (value, converter) => {
@@ -11,10 +11,14 @@ exports.convertValue = (value, converters) => {
     switch (converter) {
       case 'Number':
         return Number(value)
+      case 'Boolean':
+        return Boolean(value)
       case 'String':
         return String(value)
       case 'Date':
         return new Date(value)
+      case 'JSON.parse':
+        return JSON.parse(value)
       case 'JSON.stringify':
         return JSON.stringify(value)
       case 'toString.base64':
@@ -34,11 +38,26 @@ exports.convertValue = (value, converters) => {
           ('00' + value.getUTCSeconds()).slice(-2)
       }
       default:
+        if (converter.startsWith('_get.')) {
+          const [, ...path] = converter.split('.')
+          return _.get(value, path)
+        }
         return value
     }
   }
 
   return converters.reduce(convert, value)
+}
+
+exports.getValue = (item, path) => {
+  if (typeof path !== 'string') {
+    return path
+  } else if (path.startsWith('!')) {
+    return path.slice(1)
+  }
+
+  const [prop, ...converters] = path.split('/')
+  return convertValue(_.get(item, prop), converters)
 }
 
 exports.handleOptions = () => {
@@ -51,14 +70,84 @@ exports.handleOptions = () => {
   }
 }
 
-exports.detectTags = text => {
-  const ms = text.match(/@\[(.+?)\-(.+?)\]/s)
-  const tags = []
-  for (const m of ms) {
-    tags.push({
-      username: m[1],
-      display_name: m[2]
-    })
+exports.getActor = async (item, path) => {
+  path = path || 'eventData.by'
+  const actorAddr = _.get(item, path)
+  const tags = await queryTags(actorAddr)
+  debug(tags)
+  const actorName = tags['display-name']
+  const actorAvatar = tags.avatar
+  return {
+    actorAddr, actorName, actorAvatar
   }
-  return tags
+}
+
+exports.getTargets = (item, targetPaths, actorAddr) => {
+  return targetPaths.reduce((list, prop) => {
+    const v = _.get(item, prop)
+    if (v && v !== actorAddr && !list.includes(v)) {
+      list.push(v)
+    }
+    return list
+  }, [])
+}
+
+exports.handleTargets = (sql, values, targets) => {
+  targets.forEach(t => {
+    debug(sql, values, t)
+    t && query(sql, [...values, t]).catch(debug)
+  })
+}
+
+const detectTags = text => {
+  const ms = text.matchAll(/@\[(.+?)-(.+?)\]/gs)
+  const usernames = []
+  for (const [, u] of ms) {
+    const full = 'account.' + u
+    !usernames.includes(full) && usernames.push(full)
+  }
+  return usernames
+}
+
+exports.handleTags = async (item, tagPath, sql, values, targetPaths) => {
+  if (tagPath) {
+    const usernames = detectTags(exports.getValue(item, tagPath))
+    debug('Tagged usernames', usernames)
+    const actorAddr = values[1]
+    debug('actorAddr', actorAddr)
+    const excludes = exports.getTargets(item, targetPaths)
+    const tagged = await resolveAlias(usernames) || []
+    debug('hhhhhhhhhhhhxxxx', excludes, tagged)
+    const targets = (tagged || []).filter(addr => addr && addr !== actorAddr && !excludes.includes(addr))
+
+    if (targets.length) {
+      const taggedValues = ['tag_' + values[0], ...values.slice(1)]
+      exports.handleTargets(sql, taggedValues, targets)
+    }
+  }
+}
+
+exports.push = (array, item) => {
+  array.push(item)
+  return array
+}
+
+const close = () => {
+  const unsub =
+    global._sub && global._sub.unsubscribe
+      ? global._sub.unsubscribe()
+      : Promise.resolve(undefined)
+  unsub.finally(() => {
+    Promise.resolve(closeWeb3).finally(disconnect(debug))
+  })
+}
+
+exports.handleError = (error) => {
+  debug(error)
+  close()
+
+  // for some reason, it does not exit
+  setTimeout(() => {
+    process.exit(1)
+  }, 5000)
 }
