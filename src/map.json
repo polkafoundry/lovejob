@@ -11,7 +11,7 @@
             "map": {
                 "text": "eventData.log.s_content",
                 "image": "eventData.log.coverImg",
-                "timestamp": "eventData.log.s_info.date",
+                "timestamp": "!now",
                 "item_id": "eventData.log.id",
                 "item_type": "eventData.log.type",
                 "item_status": "eventData.log.status",
@@ -33,7 +33,7 @@
                 "item_id": "eventData.log.id",
                 "item_type": "eventData.log.type",
                 "item_data": "eventData.log.lockIndex",
-                "timestamp": "eventData.log.info.date",
+                "timestamp": "!now",
                 "item_sender": "eventData.log.sender",
                 "item_receiver": "eventData.log.receiver"
             }
@@ -51,7 +51,7 @@
                 "item_id": "eventData.log.id",
                 "item_type": "eventData.log.type",
                 "item_flag": true,
-                "timestamp": "eventData.log.info.date",
+                "timestamp": "!now",
                 "item_sender": "eventData.log.sender",
                 "item_receiver": "eventData.log.receiver"
             }

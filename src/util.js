@@ -52,6 +52,8 @@ const convertValue = (value, converters) => {
 exports.getValue = (item, path) => {
   if (typeof path !== 'string') {
     return path
+  } else if (path === '!now') {
+    return Date.now()
   } else if (path.startsWith('!')) {
     return path.slice(1)
   }
@@ -62,7 +64,7 @@ exports.getValue = (item, path) => {
 
 exports.handleOptions = () => {
   return {
-    origin: '*',
+    origin: process.env.ALLOW_ORIGIN || '*',
     methods: 'GET,POST,PUT,OPTIONS',
     credentials: true,
     maxAge: 86400,

@@ -6,19 +6,12 @@ const { query, disconnect } = require('./db')
 const { handleOptions } = require('./util')
 
 fastify.register(cors, handleOptions())
-fastify.get('/', async (request, reply) => {
-  reply.send('Wellcome LoveJob API!')
-})
-fastify.get('/noti/list', async (request) => {
-  const address = request.query.address
-  debug(`Get notifications for ${address}`)
-  if (!address) {
-    return {
-      ok: false,
-      error: 'Address is required.'
-    }
-  }
 
+fastify.get('/', (request, reply) => {
+  reply.send('Welcome to LoveLock API.')
+})
+
+const getNotiList = async address => {
   const sqlLock =
     "SELECT * FROM notification WHERE event_name = 'createLock' AND target = ? ORDER BY id DESC LIMIT 10"
 
@@ -38,6 +31,37 @@ fastify.get('/noti/list', async (request) => {
       error: String(error)
     }
   }
+}
+
+const markNoti = async (field, value, address) => {
+  const where = field === 'item_id' ? "event_name = 'createLock' AND " : ''
+  const sql = `DELETE FROM notification WHERE ${where}${field} = ?`
+  try {
+    const result = await query(sql, [value])
+    return address ? getNotiList(address) : {
+      ok: true,
+      result
+    }
+  } catch (error) {
+    debug(error)
+    return {
+      ok: false,
+      error: String(error)
+    }
+  }
+}
+
+fastify.get('/noti/list', async (request) => {
+  const address = request.query.address
+  debug(`Get notifications for ${address}`)
+  if (!address) {
+    return {
+      ok: false,
+      error: 'Address is required.'
+    }
+  }
+
+  return getNotiList(address)
 })
 
 // mark an notification as read
@@ -52,21 +76,7 @@ fastify.get('/noti/mark', async (request) => {
     }
   }
 
-  const where = field === 'item_id' ? "event_name = 'createLock' AND " : ''
-  const sql = `DELETE FROM notification WHERE ${where}${field} = ?`
-  try {
-    const result = await query(sql, [value])
-    return {
-      ok: true,
-      result
-    }
-  } catch (error) {
-    debug(error)
-    return {
-      ok: false,
-      error: String(error)
-    }
-  }
+  return markNoti(field, value, request.query.address)
 })
 
 // Run the server!
