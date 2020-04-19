@@ -9,18 +9,25 @@ CREATE TABLE `notification` (
   `read` bool DEFAULT FALSE,
   `event_name` varchar(255) NOT NULL,
   `actor_addr` varchar(255) NOT NULL,
-  `actor_name` varchar(255) NULL,
+  `actor_name` varchar(255) CHARACTER SET utf8,
   `actor_avatar` varchar(255) NULL,
-  `text` varchar(255) NULL,
-  `image` varchar(255) NULL,
+  `text` varchar(255) CHARACTER SET utf8,
+  `image` varchar(255),
   `timestamp` bigint NOT NULL,
-  `item_id` int NULL,
-  `item_type` int NULL,
-  `item_status` int NULL,
+  `item_id` int,
+  `item_type` int,
+  `item_status` int,
   `item_flag` bool DEFAULT FALSE,
-  `item_sender` varchar(255) NULL,
-  `item_receiver` varchar(255) NULL,
-  `item_data` varchar(1024) NULL,
-  `extra_data` varchar(1024) NULL,
-  PRIMARY KEY (`id`)
+  `item_sender` varchar(255),
+  `item_receiver` varchar(255),
+  `item_data` varchar(1024) CHARACTER SET utf8,
+  `extra_data` varchar(1024) CHARACTER SET utf8,
+  PRIMARY KEY (`id`),
+  KEY `target` (`target`),
+  KEY `event_name` (`event_name`),
+  KEY `item_id` (`item_id`)
 );
+
+ALTER TABLE `notification` ADD INDEX `target` (`target`);
+ALTER TABLE `notification` ADD INDEX `event_name` (`event_name`);
+ALTER TABLE `notification` ADD INDEX `item_id` (`item_id`);
