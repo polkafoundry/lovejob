@@ -116,10 +116,8 @@ exports.handleTags = async (item, tagPath, sql, values, targetPaths) => {
     const usernames = detectTags(exports.getValue(item, tagPath))
     debug('Tagged usernames', usernames)
     const actorAddr = values[1]
-    debug('actorAddr', actorAddr)
     const excludes = exports.getTargets(item, targetPaths)
     const tagged = await resolveAlias(usernames) || []
-    debug('hhhhhhhhhhhhxxxx', excludes, tagged)
     const targets = (tagged || []).filter(addr => addr && addr !== actorAddr && !excludes.includes(addr))
 
     if (targets.length) {
@@ -144,12 +142,21 @@ const close = () => {
   })
 }
 
-exports.handleError = (error) => {
-  debug(error)
+exports.handleError = error => {
+  debug('Socket Error', error)
   close()
 
   // for some reason, it does not exit
   setTimeout(() => {
-    process.exit(1)
+    process.exit(2)
   }, 5000)
+}
+
+exports.handleClose = event => {
+  debug('Closing...', event)
+
+  // for some reason, it does not exit
+  setTimeout(() => {
+    process.exit(1)
+  }, 3000)
 }

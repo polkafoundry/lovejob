@@ -28,7 +28,10 @@ global._sub = contract.events.allEvents({}, async (error, result) => {
 
 const closeWeb3 = () => web3.close()
 
-const initWeb3 = errorHandler => web3.onError(errorHandler)
+const initWeb3 = (errorHandler, closeHandler) => {
+  web3.onError(errorHandler)
+  web3.onClose(closeHandler)
+}
 
 module.exports = {
   queryTags,

@@ -20,10 +20,29 @@
             }
         },
         {
+            "eventName": "confirmLock",
+            "options": {
+                "conditions": {
+                    "eventData.log.status": 1
+                }
+            },
+            "map": {
+                "text": "eventData.log.s_content",
+                "image": "eventData.log.coverImg",
+                "timestamp": "!now",
+                "item_id": "eventData.log.id",
+                "item_type": "eventData.log.type",
+                "item_status": "eventData.log.status",
+                "item_sender": "eventData.log.sender",
+                "item_receiver": "eventData.log.receiver"
+            }
+        },
+        {
             "eventName": "addMemory",
             "options": {
                 "conditions": {
-                    "eventData.log.info.blog/Boolean": false
+                    "eventData.log.info.blog/Boolean": false,
+                    "eventData.log.type": 0
                 },
                 "tagPath": "eventData.log.content"
             },

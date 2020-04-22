@@ -8,7 +8,8 @@ const {
   getActor,
   handleTags,
   push,
-  handleError
+  handleError,
+  handleClose
 } = require('./util')
 
 const {
@@ -36,9 +37,12 @@ const handleEvent = async result => {
 
       // Check conditions whether to skip this item
       if (conditions) {
+        // conditions are AND
         const ok = Object.entries(conditions).every(([path, mustBe]) => {
+          const not = path.startsWith('!')
+          if (not) path = path.slice(1)
           const value = getValue(item, path)
-          return value === mustBe
+          return not ? value !== mustBe : value === mustBe
         })
         if (!ok) {
           debug('Item skipped')
@@ -74,7 +78,7 @@ const handleEvent = async result => {
 }
 
 const start = () => {
-  initWeb3(handleError)
+  initWeb3(handleError, handleClose)
   listenAllEvents(handleEvent, handleError)
 
   debug('Job is watching for events...')
