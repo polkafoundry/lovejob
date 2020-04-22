@@ -149,7 +149,7 @@ exports.handleError = error => {
   // for some reason, it does not exit
   setTimeout(() => {
     process.exit(2)
-  }, 5000)
+  }, 2000)
 }
 
 exports.handleClose = event => {
@@ -158,5 +158,5 @@ exports.handleClose = event => {
   // for some reason, it does not exit
   setTimeout(() => {
     process.exit(1)
-  }, 3000)
+  }, 1000)
 }
