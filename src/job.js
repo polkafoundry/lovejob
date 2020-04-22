@@ -14,7 +14,8 @@ const {
 
 const {
   initWeb3,
-  listenAllEvents
+  listenAllEvents,
+  ping
 } = require('./web3')
 
 const { table, mapping } = require('./map.json')
@@ -80,6 +81,10 @@ const handleEvent = async result => {
 const start = () => {
   initWeb3(handleError, handleClose)
   listenAllEvents(handleEvent, handleError)
+
+  setInterval(() => {
+    ping().catch(handleError)
+  }, +process.env.PING_INTERNAL || 45000)
 
   debug('Job is watching for events...')
 }

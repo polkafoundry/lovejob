@@ -33,10 +33,13 @@ const initWeb3 = (errorHandler, closeHandler) => {
   web3.onClose(closeHandler)
 }
 
+const ping = web3.getBlockchainStatus.bind(web3)
+
 module.exports = {
   queryTags,
   resolveAlias,
   listenAllEvents,
   initWeb3,
-  closeWeb3
+  closeWeb3,
+  ping
 }
