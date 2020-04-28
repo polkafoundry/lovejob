@@ -105,7 +105,7 @@
             }
         },
         {
-            "eventName": "addFollowLock",
+            "eventName": "followLock",
             "options": {
                 "conditions": {
                     "eventData.log.isFollow": true
@@ -116,6 +116,19 @@
                 "item_id": "eventData.log.id",
                 "timestamp": "eventData.log.timestamp",
                 "item_sender": "eventData.log.sender",
+                "item_receiver": "eventData.log.receiver"
+            }
+        },
+        {
+            "eventName": "followPerson",
+            "options": {
+                "conditions": {
+                    "eventData.log.isFollow": true
+                }
+            },
+            "map": {
+                "text": "eventData.log.lockName",
+                "timestamp": "eventData.log.timestamp",
                 "item_receiver": "eventData.log.receiver"
             }
         }
