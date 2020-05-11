@@ -21,9 +21,9 @@ const ensureContract = () => resolveAlias(process.env.LOVELOCK_CONTRACT)
 
 const listenAllEvents = async (resultHandler, errorHandler) => {
   const contract = await ensureContract()
-global._sub = contract.events.allEvents({}, async (error, result) => {
+  global._sub = contract.events.allEvents({}, async (error, result) => {
     return error ? errorHandler(error) : resultHandler(result)
-})
+  })
 }
 
 const closeWeb3 = () => web3.close()

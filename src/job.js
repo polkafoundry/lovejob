@@ -20,9 +20,7 @@ const {
 
 const { table, mapping } = require('./map.json')
 
-const handleEvent = async result => {
-  debug(result)
-  result.forEach(async item => {
+const handleEvent = async item => {
     const eventName = item.eventName
 
     const eventConfigs = mapping.filter(m => m.eventName === eventName)
@@ -75,7 +73,6 @@ const handleEvent = async result => {
       // now, handle tagging usernames
       handleTags(item, tagPath, sql, values, targetPaths)
     })
-  })
 }
 
 const start = () => {

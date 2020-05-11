@@ -19,7 +19,7 @@ const getNotiList = async address => {
     "SELECT * FROM notification WHERE event_name <> 'createLock' AND target = ? ORDER BY id DESC LIMIT 10"
 
   try {
-    const result = await Promise.all([query(sqlLock, [address]), query(sqlNonLock, [address])]) 
+    const result = await Promise.all([query(sqlLock, [address]), query(sqlNonLock, [address])])
     return {
       ok: true,
       result
